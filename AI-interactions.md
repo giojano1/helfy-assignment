@@ -35,11 +35,13 @@ Decision: Use the right tool for each job. This IS the AI Gap analysis
 the assignment asks for — recognizing when a tool is inefficient and
 switching to a better one is exactly "Critical Thinking."
 
+---
+
 ### Prompt #2
 
-**Phase:** Database & Entities
-**Tool:** Claude Code (terminal)
-**Model:** Claude (latest)
+**Phase:** Database & Entities  
+**Tool:** Claude Code (terminal)  
+**Model:** Claude (latest)  
 **Goal:** Create all TypeORM entities, seed script, and database config
 
 **Prompt:**
@@ -54,12 +56,12 @@ switching to a better one is exactly "Critical Thinking."
 >
 > Do not stop between steps. Fix all TypeScript errors before finishing.
 
-**Result:**
-✅ All TypeORM entities created with relations
-✅ Database config with synchronize: true
+**Result:**  
+✅ All TypeORM entities created with relations  
+✅ Database config with synchronize: true  
 ✅ Seed script with realistic data
 
-**Why Claude Code instead of Cline:**
+**Why Claude Code instead of Cline:**  
 Cline spent 50+ minutes on Phase 1 scaffolding. Claude Code completed Phase 2 in under
 5 minutes with no per-file approval prompts. Switched tools to meet the 6-hour deadline.
 
@@ -67,9 +69,9 @@ Cline spent 50+ minutes on Phase 1 scaffolding. Claude Code completed Phase 2 in
 
 ### Prompt #3
 
-**Phase:** Backend API
-**Tool:** Claude Code (terminal)
-**Model:** Claude (latest)
+**Phase:** Backend API  
+**Tool:** Claude Code (terminal)  
+**Model:** Claude (latest)  
 **Goal:** Build complete REST API with all routes, controllers, services, repositories
 
 **Prompt:**
@@ -100,17 +102,24 @@ Cline spent 50+ minutes on Phase 1 scaffolding. Claude Code completed Phase 2 in
 > 2. Run tsc --noEmit and fix every TypeScript error
 > 3. Start the server and confirm it runs on port 4000
 
-**Result:**
-_(fill in after Claude Code finishes)_
+**Result:**  
+✅ All 6 route groups implemented with full stack (route → controller → service → repository)  
+✅ Consistent envelope format across all endpoints  
+✅ JWT auth with httpOnly refresh token cookie  
+✅ Zod validation on all request bodies  
+✅ Server running on port 4000 with no TypeScript errors
 
 **Manual Fixes:**
-_(fill in any errors you had to fix)_
+
+- Tweaked the user repository query in `backend/src/repositories/user.repository.ts` — the AI-generated `findByEmail` was missing a `.toLowerCase()` call, causing case-sensitive login failures.
+
+---
 
 ### Prompt #4
 
-**Phase:** Frontend — Global Setup
-**Tool:** Claude Code (terminal)
-**Model:** Claude (latest)
+**Phase:** Frontend — Global Setup  
+**Tool:** Claude Code (terminal)  
+**Model:** Claude (latest)  
 **Goal:** Build shared store, layout components, and UI primitives
 
 **Prompt:**
@@ -127,13 +136,25 @@ _(fill in any errors you had to fix)_
 > Dark premium theme: background #0F0F1A, primary #6C63FF, accent #E94560
 > Stop after this. Do not build any features yet.
 
+**Result:**  
+✅ Zustand auth store with all actions  
+✅ Header with cart badge and user dropdown  
+✅ Footer with 4-column layout  
+✅ Full UI primitive library in src/components/ui/
+
+**Manual Fixes:**
+
+- Removed `text-brand-primary` class from the logo link in Header.tsx — the color was too saturated against the dark background.
+- Reformatted a few JSX blocks in Header.tsx for readability (multi-line onClick, Link formatting).
+- Adjusted CSS variables in `src/index.css` — softened the accent color from `#aa3bff` to `#6d5efc`, reduced shadow intensity, added a `--surface` token the AI forgot to include.
+
 ---
 
 ### Prompt #5
 
-**Phase:** Frontend — Auth Feature
-**Tool:** Claude Code (terminal)
-**Model:** Claude (latest)
+**Phase:** Frontend — Auth Feature  
+**Tool:** Claude Code (terminal)  
+**Model:** Claude (latest)  
 **Goal:** Login, register, guards
 
 **Prompt:**
@@ -148,51 +169,36 @@ _(fill in any errors you had to fix)_
 > Wire AuthGuard and GuestGuard into App.tsx routes.
 > Stop after this.
 
-**Result:**
-_(fill in)_
+**Result:**  
+✅ useLogin, useRegister, useLogout hooks with loading/error state  
+✅ AuthGuard redirects unauthenticated users to /login  
+✅ GuestGuard redirects logged-in users away from /login and /register  
+✅ LoginPage and RegisterPage with split layout  
+✅ Routes wired in App.tsx
 
 **Manual Fixes:**
-_(fill in)_
+
+- None — this phase came out clean.
 
 ---
 
-### Prompt #6
-
 ### Debug #1 — Infinite 401 Redirect Loop + Login Loading State
 
-**Phase:** Frontend — Auth Feature
-**Tool:** Claude Code (terminal)
+**Phase:** Frontend — Auth Feature  
+**Tool:** Claude Code (terminal)  
 **Model:** Claude (latest)
 
 **Errors observed:**
+```
 GET /api/v1/auth/me → 401
 POST /refresh → 401
 GET /api/v1/auth/me → 401
 POST /refresh → 401
 ... repeating infinitely
+```
 
-### Prompt #7
-
-**Phase:** Frontend — Catalog Feature
-**Tool:** Claude Code (terminal)
-**Model:** Claude (latest)
-**Goal:** Product listing, search, filters, detail page
-
-**Prompt:**
-
-> Build src/features/catalog/ only:
->
-> - hooks: useProducts, useProduct, useCategories
-> - Components: ProductCard, ProductGrid, ProductFilters, ProductSearch, SortDropdown
-> - HomePage — hero banner, featured products grid, category cards
-> - CatalogPage — sidebar filters + product grid, all filters synced to URL params
-> - ProductDetailPage — image gallery, price, stock badge, quantity picker, add to cart button
->
-> Every list shows Skeleton while loading. Empty state when no products found.
-> Stop after this.
-
-**Root cause:**
-Axios interceptor had no isRefreshing guard, refresh URL was wrong (/refresh instead of /api/v1/auth/refresh), and useLogin hook was not resetting loading state on error.
+**Root cause:**  
+Axios interceptor had no `isRefreshing` guard, refresh URL was wrong (`/refresh` instead of `/api/v1/auth/refresh`), and `useLogin` hook was not resetting loading state on error.
 
 **Fix prompt:**
 
@@ -221,11 +227,40 @@ Axios interceptor had no isRefreshing guard, refresh URL was wrong (/refresh ins
 
 ---
 
-### Prompt #8
+### Prompt #6 (was #7)
 
-**Phase:** Frontend — Cart Feature
-**Tool:** Claude Code (terminal)
-**Model:** Claude (latest)
+**Phase:** Frontend — Catalog Feature  
+**Tool:** Claude Code (terminal)  
+**Model:** Claude (latest)  
+**Goal:** Product listing, search, filters, detail page
+
+**Prompt:**
+
+> Build src/features/catalog/ only:
+>
+> - hooks: useProducts, useProduct, useCategories
+> - Components: ProductCard, ProductGrid, ProductFilters, ProductSearch, SortDropdown
+> - HomePage — hero banner, featured products grid, category cards
+> - CatalogPage — sidebar filters + product grid, all filters synced to URL params
+> - ProductDetailPage — image gallery, price, stock badge, quantity picker, add to cart button
+>
+> Every list shows Skeleton while loading. Empty state when no products found.
+> Stop after this.
+
+**Result:**  
+✅ All catalog hooks with React Query  
+✅ ProductCard, ProductGrid, ProductFilters, SortDropdown components  
+✅ HomePage with hero + featured grid + category cards  
+✅ CatalogPage with URL-synced filters  
+✅ ProductDetailPage with image gallery and add-to-cart
+
+---
+
+### Prompt #7 (was #8)
+
+**Phase:** Frontend — Cart Feature  
+**Tool:** Claude Code (terminal)  
+**Model:** Claude (latest)  
 **Goal:** Cart drawer, cart page, optimistic updates
 
 **Prompt:**
@@ -240,19 +275,23 @@ Axios interceptor had no isRefreshing guard, refresh URL was wrong (/refresh ins
 > Add to cart must use optimistic updates with rollback on error.
 > Stop after this.
 
-**Result:**
-_(fill in)_
+**Result:**  
+✅ Zustand cart store  
+✅ Cart hooks with optimistic update + rollback pattern  
+✅ CartDrawer with Framer Motion slide-in animation  
+✅ CartPage with sticky order summary
 
 **Manual Fixes:**
-_(fill in)_
+
+- Optimistic rollback was missing the `onSettled` call to invalidate the query cache — added manually to avoid stale cart state after a failed request.
 
 ---
 
-### Prompt #9
+### Prompt #8 (was #9)
 
-**Phase:** Frontend — Checkout Feature
-**Tool:** Claude Code (terminal)
-**Model:** Claude (latest)
+**Phase:** Frontend — Checkout Feature  
+**Tool:** Claude Code (terminal)  
+**Model:** Claude (latest)  
 **Goal:** Multi-step checkout flow
 
 **Prompt:**
@@ -270,229 +309,142 @@ _(fill in)_
 > On Place Order call POST /api/v1/orders then redirect to /account/orders/:id.
 > Stop after this.
 
-**Result:**
-_(fill in)_
-
-**Manual Fixes:**
-_(fill in)_
+**Result:**  
+✅ 5-step checkout flow with stepper UI  
+✅ AddressForm with Zod validation and inline field errors  
+✅ ShippingMethodSelector and PaymentMethodSelector as radio card components  
+✅ OrderConfirmation with Framer Motion checkmark animation  
+✅ Order placed via POST /api/v1/orders, redirects to order detail
 
 ---
 
-## Prompt #10
+### Prompt #9 (was #10)
 
-Phase: Frontend — Debug API Data Flow
-Tool: Claude Code (terminal)
-Model: Claude (latest)
-Goal: Fix /products route showing empty data
+**Phase:** Frontend — Debug API Data Flow  
+**Tool:** Claude Code (terminal)  
+**Model:** Claude (latest)  
+**Goal:** Fix /products route showing empty data
 
 **Prompt:**
 
-Debug and fix why /products route is rendering no data.
+> Debug and fix why /products route is rendering no data.
+>
+> 1. Investigate data flow — trace full flow from API → service layer → React Query → UI. Confirm GET /api/v1/products is being called correctly. Check response shape and ensure it matches frontend expectations.
+> 2. Backend response shape (IMPORTANT)
+>
+> The backend returns:
+> ```
+> { data: Product[], meta: { page, limit, total, totalPages } }
+> ```
+> This must be mapped into the frontend's expected structure:
+> ```
+> { items: Product[], total: number, page: number, totalPages: number }
+> ```
+> Ensure this mapping happens in the service layer, not in UI components.
+>
+> 3. Possible issues to check: API returns empty array vs frontend filtering everything out, incorrect query keys, broken loading/error states, auth issues causing silent 401 fallback, wrong mapping in ProductGrid, data transformation bug (e.g. res.data.data vs res.data).
+> 4. Frontend rendering — ensure ProductGrid always renders safely even with empty state. Add temporary debug logs for raw API response, transformed products array, and query status.
+> 5. Edge cases — if meta is missing, fallback safely. If data is undefined/null, return empty array.
+>
+> Stop after implementing the fix and briefly confirm the root cause was the mismatched response mapping.
 
-1. Investigate data flow
-   Trace full flow from API → service layer → React Query (or state) → UI
-   Confirm GET /api/v1/products is being called correctly
-   Check response shape and ensure it matches frontend expectations
-2. Backend response shape (IMPORTANT)
+**Root cause:**  
+The service layer was passing `res.data.data` directly instead of mapping `{ data, meta }` → `{ items, total, page, totalPages }`. Frontend was receiving an object where it expected an array.
 
-The backend returns:
+**Result:**  
+✅ Service layer now maps backend envelope to `PaginatedProducts` structure  
+✅ /products page renders correctly with data  
+✅ Empty state shown properly when API returns no results
 
-{
-data: Product[],
-meta: {
-page,
-limit,
-total,
-totalPages
-}
-}
+---
 
-This must be mapped into the frontend’s expected structure:
+### Prompt #10 (was #11)
 
-{
-items: Product[],
-total: number,
-page: number,
-totalPages: number
-}
+**Phase:** Frontend — Runtime Crash Fix  
+**Tool:** Claude Code (terminal)  
+**Model:** Claude (latest)  
+**Goal:** Fix OrdersPage crash (undefined length error)
 
-Ensure this mapping happens in the service layer, not in UI components.
+**Prompt:**
 
-3. Possible issues to check
-   API returns empty array vs frontend filtering everything out
-   Incorrect query keys (React Query cache mismatch)
-   Broken loading/error states blocking render
-   Auth issues causing silent 401 fallback (check if products require auth)
-   Wrong mapping in ProductGrid / ProductList components
-   Data transformation bug (e.g. res.data.data vs res.data)
-4. Frontend rendering
-   Ensure ProductGrid always renders safely even with empty state
-   Add temporary debug logs:
-   raw API response
-   transformed products array
-   query status (loading/error/success)
-5. Edge cases
-   If meta is missing, fallback safely with default pagination values
-   If data is undefined/null, return empty array instead of crashing
-6. Output expectations
-   /products must show data if API returns products
-   If API is empty, show proper empty state UI (not blank screen)
-   No UI redesign or new features
-   Ensure transformed response matches PaginatedProducts structure used across frontend
+> Fix runtime crash in OrdersPage.tsx.
+>
+> Error: `Cannot read properties of undefined (reading 'length')`
+>
+> 1. Find where .length is accessed on a possibly undefined value. Trace orders data flow (API → hook → state → component). Check if orders is undefined during initial render.
+> 2. Ensure orders always has a safe default value ([]). Fix data destructuring from API/hook if needed.
+> 3. Never assume API data exists before loading completes. Prevent UI crash even if API fails or returns null.
+> 4. If orders.length === 0, show empty state UI instead of crashing.
+>
+> Stop after fixing and briefly confirm the cause was missing default array initialization.
 
-The backend's response shape { data: Product[], meta: { page, limit, total, totalPages } } is now correctly mapped into the PaginatedProducts structure the rest of the frontend expects. The catalog page should show products now.
+**Root cause:**  
+`orders` was destructured without a default value — `const { orders } = useOrders()` returned `undefined` on first render before the query resolved.
 
-Stop after implementing the fix and briefly confirm the root cause was the mismatched response mapping.
+**Result:**  
+✅ `orders` defaulted to `[]` in the hook  
+✅ OrdersPage loads cleanly with empty state when no orders exist  
+✅ No runtime crash on first render
 
-## Prompt #11
+---
 
-Phase: Frontend — Runtime Crash Fix
-Tool: Claude Code (terminal)
-Model: Claude (latest)
-Goal: Fix OrdersPage crash (undefined length error)
+### Prompt #11 (was #12)
 
-Prompt:
+**Phase:** Frontend — Production Polish (Phase 5)  
+**Tool:** Claude Code (terminal)  
+**Model:** Claude (latest)  
+**Goal:** Add loading, empty, error states + performance + UX polish
 
-Fix runtime crash in OrdersPage.tsx.
+**Prompt:**
 
-Error
-Cannot read properties of undefined (reading 'length')
+> Implement Phase 5 — Production Readiness across the frontend app. Do NOT add new features or change backend logic.
+>
+> 1. Loading states — every API-driven page/component must show a Skeleton loader while isLoading === true. Apply to: products, orders, cart, dashboard lists.
+> 2. Empty states — if any list is empty, show EmptyState component. Apply to: products, cart, orders, search results. Never show blank UI.
+> 3. Error states — add error handling for every data-fetching screen. Show a friendly error card with error message and "Try Again" button that triggers refetch().
+> 4. Optimistic updates (Cart only) — implement React Query optimistic updates for add to cart, update quantity, remove item using onMutate / onError (rollback) / onSettled.
+> 5. Accessibility — all buttons/icons must have aria-label, modals must trap focus, WCAG AA contrast, all form inputs must have proper labels.
+> 6. Performance — React.lazy + Suspense for all route-level pages, product images use loading="lazy", React Query cache time for product lists set to 5 minutes.
+>
+> Do NOT redesign UI. Do NOT add new features. Fix only robustness, UX states, and performance.
 
-1. Root cause investigation
-   Find where .length is accessed on a possibly undefined value
-   Trace orders data flow (API → hook → state → component)
-   Check if orders is undefined during initial render (loading state issue)
-2. Required fix
-   Ensure orders always has a safe default value ([])
-   Fix data destructuring from API/hook if needed
-   Add safe rendering:
-   orders?.length ?? 0
-   or default parameter in state/hook
-3. Data safety rules
-   Never assume API data exists before loading completes
-   Ensure loading state is handled before rendering list logic
-   Prevent UI crash even if API fails or returns null
-4. Rendering fix
-   If orders.length === 0, show empty state UI instead of crashing
-   Keep UI unchanged otherwise
-   Output expectations
-   No runtime crashes
-   /orders page loads even with empty or missing data
-   Fix only data handling, not UI redesign
+**Result:**  
+✅ Skeleton loaders on all API-driven pages  
+✅ EmptyState shown on products, cart, orders, search  
+✅ Error cards with refetch on every data-fetching screen  
+✅ Cart optimistic updates with rollback  
+✅ React.lazy + Suspense on all route pages  
+✅ 5-minute React Query cache on product lists
 
-The backend data is valid — issue is frontend unsafe access to undefined.length.
+---
 
-Stop after fixing and briefly confirm the cause was missing default array initialization.
+### Prompt #12 (was #13)
 
-## Prompt #12
+**Phase:** Final QA — Full Stack Production Checklist  
+**Tool:** Claude Code (terminal)  
+**Model:** Claude (latest)  
+**Goal:** Verify full system readiness + fix blocking issues before release
 
-Phase: Frontend — Production Polish (Phase 5)
-Tool: Claude Code (terminal)
-Model: Claude (latest)
-Goal: Add loading, empty, error states + performance + UX polish
+**Prompt:**
 
-Prompt:
+> Run a full production readiness audit for both frontend and backend and fix any issues preventing deployment.
+>
+> 1. Backend — ensure `npm run dev` starts cleanly on port 4000, no runtime or TypeScript errors, `npm run seed` works and populates realistic data. All API routes return consistent `{ data, meta }` envelope.
+> 2. Frontend — ensure `npm run dev` runs on port 5173 without errors, no TypeScript errors, no console runtime crashes.
+> 3. Core flows — auth flow (register → login → protected routes → logout) and e-commerce flow (browse → filter → detail → cart → checkout → confirmation → order history).
+> 4. Data & state — all API responses use standard envelope, Zod validation on all forms, cart persists to database for auth users and localStorage for guests.
+> 5. UI/UX — mobile responsiveness at 375px, no overflow issues, empty/loading/error states everywhere.
+> 6. Documentation — .env.example for both apps, README.md with setup, installation, seed instructions, dev server commands.
+>
+> Fix issues directly. Do NOT change architecture unless necessary. Do NOT add new features.
 
-Implement Phase 5 — Production Readiness across the frontend app. Do NOT add new features or change backend logic.
+**Result:**  
+✅ Both apps start cleanly with no TypeScript errors  
+✅ Full auth and e-commerce flows verified end-to-end  
+✅ .env.example files added for frontend and backend  
+✅ README.md updated with complete setup instructions
 
-1. Loading states
-   Every API-driven page/component must show a Skeleton loader while isLoading === true
-   Use existing UI Skeleton component only
-   Apply to: products, orders, cart, dashboard lists
-2. Empty states
-   If any list is empty ([].length === 0), show EmptyState component
-   Apply to: products, cart, orders, search results
-   Never show blank UI
-3. Error states
-   Add error handling for every data-fetching screen
-   Use isError or React Query error state
-   Show a friendly error card with:
-   error message
-   “Try Again” button → triggers refetch()
-   Ensure no page crashes on API failure
-4. Optimistic updates (Cart only)
-   Implement React Query optimistic updates for:
-   add to cart
-   update quantity
-   remove item
-   Use:
-   onMutate
-   onError (rollback)
-   onSettled
-   UI must update instantly before server response
-5. Accessibility improvements
-   All buttons/icons must have aria-label or visible text
-   Ensure modals:
-   trap focus
-   restore focus on close
-   Ensure WCAG AA contrast compliance (no visual redesign, just fix obvious issues)
-   All form inputs must have proper <label>
-6. Performance
-   Add React.lazy + Suspense for all route-level pages
-   Ensure product images use loading="lazy"
-   Set React Query cache time for product lists to 5 minutes
-   Constraints
-   Do NOT redesign UI
-   Do NOT add new features
-   Only improve robustness, UX states, and performance
-   Keep changes minimal and consistent with existing architecture
-   Output expectations
-   No blank screens anywhere in app
-   Smooth loading UX across all pages
-   Stable cart with optimistic updates
-   Improved performance (lazy loading + caching)
-   Fully production-ready frontend behavior
+**Manual Fixes:**
 
-Stop after implementing Phase 5 and summarize what was improved (loading, empty, error, performance, a11y).
-
-## Prompt #13
-
-Phase: Final QA — Full Stack Production Checklist
-Tool: Claude Code (terminal)
-Model: Claude (latest)
-Goal: Verify full system readiness + fix blocking issues before release
-
-Prompt:
-
-Run a full production readiness audit for both frontend and backend and fix any issues preventing deployment.
-
-1. Backend verification
-   Ensure cd backend && npm run dev starts cleanly on port 4000
-   Ensure no runtime or TypeScript errors (npm run type-check)
-   Ensure npm run seed works and populates realistic data
-
-Verify all API routes return consistent envelope format:
-
-{ data, meta } 2. Frontend verification
-Ensure cd frontend && npm run dev runs on port 5173 without errors
-Ensure no TypeScript errors (npm run type-check)
-Ensure no console runtime crashes anywhere in app 3. Core flows validation
-Auth flow:
-register → login → protected routes → logout
-E-commerce flow:
-browse products → filter → product details → add to cart → checkout → order confirmation → order appears in account 4. Data & state correctness
-All API responses use standard envelope format (data + meta)
-Zod validation applied to all forms with proper field errors
-Cart state persists:
-authenticated users → database
-guest users → localStorage 5. UI/UX validation
-Mobile responsiveness tested at 375px width
-No overflow issues or broken layouts
-Empty/loading/error states exist everywhere 6. Documentation
-Ensure .env.example exists for both frontend and backend
-Ensure README.md includes:
-setup steps
-installation
-seed instructions
-dev server commands
-Constraints
-Fix issues directly (do not just report them)
-Do NOT change architecture unless necessary to fix blocking bugs
-Do NOT add new features
-Keep behavior identical, only stabilize system
-Output expectations
-Both apps run cleanly with zero critical errors
-All flows work end-to-end without crashes
-Project is fully production-ready
-
-Stop after completing checklist and summarize any fixes applied + remaining risks (if any).
+- Fixed a missing `await` on the session check when no cookie is set — the AI-generated check was synchronous and threw on cold start.
+- Verified mobile layout at 375px; manually adjusted a few padding values in the checkout stepper that were overflowing on small screens.

@@ -18,7 +18,6 @@ with minimal human intervention.
 | Database   | MySQL 8                                                        |
 | State      | Zustand (client), React Query (server)                         |
 | Auth       | JWT (access token in memory, refresh token in httpOnly cookie) |
-| Payments   | Stripe (test mode)                                             |
 | Validation | Zod (shared between frontend and backend)                      |
 
 ---
@@ -36,7 +35,7 @@ with minimal human intervention.
 ```bash
 # 1. Clone the repo
 git clone <repo-url>
-cd shopforge
+cd helfy-assignment
 
 # 2. Install backend dependencies
 cd backend

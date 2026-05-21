@@ -8,7 +8,11 @@ import { ErrorCard } from "../components/ui/ErrorCard";
 import { useAddToCart } from "../features/cart/hooks/useAddToCart";
 import type { Product } from "../features/catalog/types";
 
-const page = { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -20 } };
+const page = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -20 },
+};
 
 export default function HomePage() {
   const { data: featured, isLoading, isError, refetch } = useFeaturedProducts();
@@ -29,11 +33,19 @@ export default function HomePage() {
   };
 
   return (
-    <motion.div variants={page} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.25 }}>
+    <motion.div
+      variants={page}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      transition={{ duration: 0.25 }}
+    >
       <section className="relative overflow-hidden bg-brand-gradient px-4 py-24 text-center">
         <div className="relative z-10 mx-auto max-w-3xl">
           <h1 className="text-5xl font-bold text-white md:text-6xl">
-            Shop the future,<br />delivered today.
+            Shop the future,
+            <br />
+            delivered today.
           </h1>
           <p className="mt-4 text-lg text-white/80">
             Premium products for the modern lifestyle.
@@ -50,7 +62,9 @@ export default function HomePage() {
 
       {categories && categories.length > 0 && (
         <section className="mx-auto max-w-7xl px-4 py-16">
-          <h2 className="mb-8 text-2xl font-bold text-text-primary">Shop by Category</h2>
+          <h2 className="mb-8 text-2xl font-bold text-text-primary">
+            Shop by Category
+          </h2>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
             {categories.map((cat) => (
               <Link
@@ -61,7 +75,10 @@ export default function HomePage() {
                 <span className="font-medium text-text-primary group-hover:text-brand-primary transition-colors">
                   {cat.name}
                 </span>
-                <ArrowRight size={16} className="text-text-muted group-hover:text-brand-primary transition-colors" />
+                <ArrowRight
+                  size={16}
+                  className="text-text-muted group-hover:text-brand-primary transition-colors"
+                />
               </Link>
             ))}
           </div>
@@ -70,8 +87,13 @@ export default function HomePage() {
 
       <section className="mx-auto max-w-7xl px-4 py-8 pb-20">
         <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-text-primary">Featured Products</h2>
-          <Link to="/products" className="text-sm text-brand-primary hover:underline">
+          <h2 className="text-2xl font-bold text-text-primary">
+            Featured Products
+          </h2>
+          <Link
+            to="/products"
+            className="text-sm text-brand-primary hover:underline"
+          >
             View all
           </Link>
         </div>
