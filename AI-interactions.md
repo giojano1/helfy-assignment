@@ -278,28 +278,68 @@ _(fill in)_
 
 ---
 
-### Prompt #10
+### Prompt #11
 
-**Phase:** Frontend — Account Feature
-**Tool:** Claude Code (terminal)
-**Model:** Claude (latest)
-**Goal:** Profile, order history, order detail
+Phase: Frontend — Debug API Data Flow
+Tool: Claude Code (terminal)
+Model: Claude (latest)
+Goal: Fix /products route showing empty data
 
-**Prompt:**
+Prompt:
 
-> Build src/features/account/ only:
->
-> - hooks: useProfile, useOrders, useUpdateProfile
-> - AccountLayout — sidebar nav with Profile and Orders links, user avatar at top
-> - ProfilePage — edit name, email, avatar URL with inline save
-> - OrdersPage — paginated table: order ID, date, status Badge, total, View link
-> - OrderDetailPage — order items table + shipping address card + status Badge
->
-> Status badge colors: pending=yellow, processing=blue, shipped=indigo, delivered=green, cancelled=red.
-> Stop after this.
+Debug and fix why /products route is rendering no data.
 
-**Result:**
-_(fill in)_
+1. Investigate data flow
+   Trace full flow from API → service layer → React Query (or state) → UI
+   Confirm GET /api/v1/products is being called correctly
+   Check response shape and ensure it matches frontend expectations
+2. Backend response shape (IMPORTANT)
 
-**Manual Fixes:**
-_(fill in)_
+The backend returns:
+
+{
+data: Product[],
+meta: {
+page,
+limit,
+total,
+totalPages
+}
+}
+
+This must be mapped into the frontend’s expected structure:
+
+{
+items: Product[],
+total: number,
+page: number,
+totalPages: number
+}
+
+Ensure this mapping happens in the service layer, not in UI components.
+
+3. Possible issues to check
+   API returns empty array vs frontend filtering everything out
+   Incorrect query keys (React Query cache mismatch)
+   Broken loading/error states blocking render
+   Auth issues causing silent 401 fallback (check if products require auth)
+   Wrong mapping in ProductGrid / ProductList components
+   Data transformation bug (e.g. res.data.data vs res.data)
+4. Frontend rendering
+   Ensure ProductGrid always renders safely even with empty state
+   Add temporary debug logs:
+   raw API response
+   transformed products array
+   query status (loading/error/success)
+5. Edge cases
+   If meta is missing, fallback safely with default pagination values
+   If data is undefined/null, return empty array instead of crashing
+6. Output expectations
+   /products must show data if API returns products
+   If API is empty, show proper empty state UI (not blank screen)
+   No UI redesign or new features
+   Ensure transformed response matches PaginatedProducts structure used across frontend
+
+The backend's response shape { data: Product[], meta: { page, limit, total, totalPages } } is now correctly mapped into the PaginatedProducts structure the rest of the frontend expects. The catalog page should show products now.
+
+Stop after implementing the fix and briefly confirm the root cause was the mismatched response mapping.

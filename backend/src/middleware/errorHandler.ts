@@ -38,7 +38,10 @@ export function errorHandler(
   }
 
   // Unexpected error — log full details but hide internals from client
-  logger.error("Unhandled error", { error: err });
+  logger.error("Unhandled error", {
+    message: err instanceof Error ? err.message : String(err),
+    stack: err instanceof Error ? err.stack : undefined,
+  });
 
   res.status(500).json({
     success: false,

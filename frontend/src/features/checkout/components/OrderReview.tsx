@@ -40,7 +40,7 @@ export function OrderReview() {
               <span className="text-text-muted">
                 {item.product.name} × {item.quantity}
               </span>
-              <span className="text-text-primary">${(item.price * item.quantity).toFixed(2)}</span>
+              <span className="text-text-primary">${(Number(item.price) * item.quantity).toFixed(2)}</span>
             </div>
           ))}
         </div>

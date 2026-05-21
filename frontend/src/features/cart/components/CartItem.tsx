@@ -26,7 +26,7 @@ export function CartItem({ item }: CartItemProps) {
         >
           {item.product.name}
         </Link>
-        <span className="text-xs text-text-muted">${item.price.toFixed(2)} each</span>
+        <span className="text-xs text-text-muted">${Number(item.price).toFixed(2)} each</span>
 
         <div className="flex items-center justify-between gap-2 mt-1">
           <div className="flex items-center rounded-lg border border-white/10">
@@ -47,7 +47,7 @@ export function CartItem({ item }: CartItemProps) {
 
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-text-primary">
-              ${(item.price * item.quantity).toFixed(2)}
+              ${(Number(item.price) * item.quantity).toFixed(2)}
             </span>
             <button
               onClick={() => remove(item.id)}

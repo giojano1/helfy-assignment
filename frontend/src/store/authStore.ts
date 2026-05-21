@@ -13,11 +13,20 @@ interface AuthState {
   clearAuth: () => void;
 }
 
+const SESSION_HINT_KEY = "_hs";
+
+export function hasSessionHint(): boolean {
+  return localStorage.getItem(SESSION_HINT_KEY) === "1";
+}
+
 export const useAuthStore = create<AuthState>((set, get) => {
   registerAuthAccessors(
     () => get().accessToken,
     (token: string) => set({ accessToken: token }),
-    () => set({ user: null, accessToken: null, isAuthenticated: false }),
+    () => {
+      localStorage.removeItem(SESSION_HINT_KEY);
+      set({ user: null, accessToken: null, isAuthenticated: false });
+    },
   );
 
   return {
@@ -25,11 +34,15 @@ export const useAuthStore = create<AuthState>((set, get) => {
     accessToken: null,
     isAuthenticated: false,
     isLoading: true,
-    setAuth: (user: UserProfile, token: string) =>
-      set({ user, accessToken: token, isAuthenticated: true, isLoading: false }),
+    setAuth: (user: UserProfile, token: string) => {
+      localStorage.setItem(SESSION_HINT_KEY, "1");
+      set({ user, accessToken: token, isAuthenticated: true, isLoading: false });
+    },
     setAccessToken: (token: string) => set({ accessToken: token }),
     setIsLoading: (loading: boolean) => set({ isLoading: loading }),
-    clearAuth: () =>
-      set({ user: null, accessToken: null, isAuthenticated: false, isLoading: false }),
+    clearAuth: () => {
+      localStorage.removeItem(SESSION_HINT_KEY);
+      set({ user: null, accessToken: null, isAuthenticated: false, isLoading: false });
+    },
   };
 });

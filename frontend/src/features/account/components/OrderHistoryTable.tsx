@@ -42,7 +42,7 @@ export function OrderHistoryTable({ orders }: OrderHistoryTableProps) {
                 </Badge>
               </td>
               <td className="px-4 py-3 text-right font-medium text-text-primary">
-                ${order.total.toFixed(2)}
+                ${Number(order.total).toFixed(2)}
               </td>
               <td className="px-4 py-3 text-right">
                 <Link

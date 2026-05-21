@@ -63,7 +63,7 @@ export class ProductRepository {
         ? 'product.price'
         : filters.sort === 'rating'
           ? 'product.rating'
-          : 'product.created_at';
+          : 'product.createdAt';
 
     qb.orderBy(sortColumn, filters.order.toUpperCase() as 'ASC' | 'DESC');
     qb.skip((filters.page - 1) * filters.limit).take(filters.limit);

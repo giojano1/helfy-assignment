@@ -9,6 +9,19 @@ interface PaginatedProducts {
   totalPages: number;
 }
 
+interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+interface ProductListResponse {
+  success: true;
+  data: Product[];
+  meta: PaginationMeta;
+}
+
 interface ApiEnvelope<T> {
   success: true;
   data: T;
@@ -16,10 +29,14 @@ interface ApiEnvelope<T> {
 
 export const catalogService = {
   getProducts: async (filters: ProductFilters = {}): Promise<PaginatedProducts> => {
-    const res = await apiClient.get<ApiEnvelope<PaginatedProducts>>("/products", {
-      params: filters,
-    });
-    return res.data.data;
+    const res = await apiClient.get<ProductListResponse>("/products", { params: filters });
+    return {
+      items: res.data.data,
+      total: res.data.meta.total,
+      page: res.data.meta.page,
+      limit: res.data.meta.limit,
+      totalPages: res.data.meta.totalPages,
+    };
   },
 
   getProductBySlug: async (slug: string): Promise<Product> => {

@@ -123,13 +123,13 @@ export default function ProductDetailPage() {
             </div>
 
             <div className="flex items-baseline gap-3">
-              <span className="text-3xl font-bold text-text-primary">${product.price.toFixed(2)}</span>
+              <span className="text-3xl font-bold text-text-primary">${Number(product.price).toFixed(2)}</span>
               {product.comparePrice && (
-                <span className="text-lg text-text-muted line-through">${product.comparePrice.toFixed(2)}</span>
+                <span className="text-lg text-text-muted line-through">${Number(product.comparePrice).toFixed(2)}</span>
               )}
               {product.comparePrice && (
                 <Badge color="green">
-                  {Math.round((1 - product.price / product.comparePrice) * 100)}% off
+                  {Math.round((1 - Number(product.price) / Number(product.comparePrice)) * 100)}% off
                 </Badge>
               )}
             </div>

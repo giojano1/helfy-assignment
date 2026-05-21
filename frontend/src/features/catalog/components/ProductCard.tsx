@@ -52,9 +52,9 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
 
         <div className="mt-auto flex items-center justify-between gap-2">
           <div className="flex items-baseline gap-1.5">
-            <span className="font-semibold text-text-primary">${product.price.toFixed(2)}</span>
+            <span className="font-semibold text-text-primary">${Number(product.price).toFixed(2)}</span>
             {product.comparePrice && (
-              <span className="text-xs text-text-muted line-through">${product.comparePrice.toFixed(2)}</span>
+              <span className="text-xs text-text-muted line-through">${Number(product.comparePrice).toFixed(2)}</span>
             )}
           </div>
 
