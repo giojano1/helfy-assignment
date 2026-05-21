@@ -7,12 +7,25 @@ interface ApiEnvelope<T> {
   data: T;
 }
 
+interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
 interface PaginatedOrders {
   items: Order[];
   total: number;
   page: number;
   limit: number;
   totalPages: number;
+}
+
+interface OrderListResponse {
+  success: true;
+  data: Order[];
+  meta: PaginationMeta;
 }
 
 export const accountService = {
@@ -31,10 +44,14 @@ export const accountService = {
   },
 
   getOrders: async (page = 1, limit = 10): Promise<PaginatedOrders> => {
-    const res = await apiClient.get<ApiEnvelope<PaginatedOrders>>("/orders", {
-      params: { page, limit },
-    });
-    return res.data.data;
+    const res = await apiClient.get<OrderListResponse>("/orders", { params: { page, limit } });
+    return {
+      items: res.data.data,
+      total: res.data.meta.total,
+      page: res.data.meta.page,
+      limit: res.data.meta.limit,
+      totalPages: res.data.meta.totalPages,
+    };
   },
 
   getOrder: async (id: string): Promise<Order> => {

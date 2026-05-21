@@ -61,6 +61,7 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps) {
           <button
             disabled={isOutOfStock}
             onClick={() => onAddToCart?.(product)}
+            aria-label={`Add ${product.name} to cart`}
             className="rounded-lg bg-brand-primary/20 p-2 text-brand-primary transition-colors hover:bg-brand-primary hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
           >
             <ShoppingCart size={16} />

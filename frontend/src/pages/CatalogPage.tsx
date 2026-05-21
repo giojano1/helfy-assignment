@@ -7,6 +7,7 @@ import { ProductFilters } from "../features/catalog/components/ProductFilters";
 import { ProductSearch } from "../features/catalog/components/ProductSearch";
 import { SortDropdown } from "../features/catalog/components/SortDropdown";
 import { Pagination } from "../components/ui/Pagination";
+import { ErrorCard } from "../components/ui/ErrorCard";
 import { useAddToCart } from "../features/cart/hooks/useAddToCart";
 import type { ProductFilters as Filters } from "../features/catalog/types";
 import type { Product } from "../features/catalog/types";
@@ -53,7 +54,7 @@ function useFiltersFromUrl(): [Filters, (patch: Partial<Filters>) => void] {
 
 export default function CatalogPage() {
   const [filters, updateFilters] = useFiltersFromUrl();
-  const { data, isLoading } = useProducts(filters);
+  const { data, isLoading, isError, refetch } = useProducts(filters);
   const { mutate: addToCart } = useAddToCart();
   const [filtersOpen, setFiltersOpen] = useState(false);
 
@@ -92,20 +93,29 @@ export default function CatalogPage() {
           </div>
 
           <div className="flex-1 min-w-0">
-            <ProductGrid
-              products={data?.items}
-              isLoading={isLoading}
-              onAddToCart={handleAddToCart}
-            />
-
-            {data && data.totalPages > 1 && (
-              <div className="mt-8 flex justify-center">
-                <Pagination
-                  page={data.page}
-                  totalPages={data.totalPages}
-                  onPageChange={(p) => updateFilters({ page: p })}
+            {isError ? (
+              <ErrorCard
+                message="Failed to load products."
+                onRetry={() => void refetch()}
+              />
+            ) : (
+              <>
+                <ProductGrid
+                  products={data?.items}
+                  isLoading={isLoading}
+                  onAddToCart={handleAddToCart}
                 />
-              </div>
+
+                {data && data.totalPages > 1 && (
+                  <div className="mt-8 flex justify-center">
+                    <Pagination
+                      page={data.page}
+                      totalPages={data.totalPages}
+                      onPageChange={(p) => updateFilters({ page: p })}
+                    />
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

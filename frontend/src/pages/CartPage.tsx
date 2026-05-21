@@ -6,11 +6,12 @@ import { CartItem } from "../features/cart/components/CartItem";
 import { CartSummary } from "../features/cart/components/CartSummary";
 import { Button } from "../components/ui/Button";
 import { Spinner } from "../components/ui/Spinner";
+import { ErrorCard } from "../components/ui/ErrorCard";
 
 const page = { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -20 } };
 
 export default function CartPage() {
-  const { items, totalPrice, isLoading } = useCart();
+  const { items, totalPrice, isLoading, isError, refetch } = useCart();
 
   return (
     <motion.div variants={page} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.2 }}>
@@ -21,6 +22,8 @@ export default function CartPage() {
           <div className="flex justify-center py-20">
             <Spinner size="lg" />
           </div>
+        ) : isError ? (
+          <ErrorCard message="Failed to load your cart." onRetry={() => void refetch()} />
         ) : items.length === 0 ? (
           <div className="flex flex-col items-center gap-5 py-20 text-center">
             <ShoppingCart size={64} className="text-text-muted opacity-30" />

@@ -32,13 +32,15 @@ export function CartItem({ item }: CartItemProps) {
           <div className="flex items-center rounded-lg border border-white/10">
             <button
               onClick={() => updateQty({ id: item.id, quantity: Math.max(1, item.quantity - 1) })}
+              aria-label="Decrease quantity"
               className="px-2 py-1 text-text-muted hover:text-text-primary text-sm"
             >
               −
             </button>
-            <span className="min-w-[1.5rem] text-center text-sm text-text-primary">{item.quantity}</span>
+            <span className="min-w-[1.5rem] text-center text-sm text-text-primary" aria-live="polite" aria-label={`Quantity: ${item.quantity}`}>{item.quantity}</span>
             <button
               onClick={() => updateQty({ id: item.id, quantity: item.quantity + 1 })}
+              aria-label="Increase quantity"
               className="px-2 py-1 text-text-muted hover:text-text-primary text-sm"
             >
               +
@@ -51,6 +53,7 @@ export function CartItem({ item }: CartItemProps) {
             </span>
             <button
               onClick={() => remove(item.id)}
+              aria-label={`Remove ${item.product.name} from cart`}
               className="rounded p-1 text-text-muted transition-colors hover:bg-brand-accent/20 hover:text-brand-accent"
             >
               <Trash2 size={14} />

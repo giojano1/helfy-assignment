@@ -6,5 +6,6 @@ export function useProducts(filters: ProductFilters = {}) {
   return useQuery({
     queryKey: ["products", filters],
     queryFn: () => catalogService.getProducts(filters),
+    staleTime: 5 * 60 * 1000,
   });
 }

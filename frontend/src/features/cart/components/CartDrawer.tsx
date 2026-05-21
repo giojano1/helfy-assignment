@@ -38,6 +38,7 @@ export default function CartDrawer() {
               <h2 className="text-lg font-semibold text-text-primary">Your Cart</h2>
               <button
                 onClick={close}
+                aria-label="Close cart"
                 className="rounded-lg p-1.5 text-text-muted transition-colors hover:bg-white/10 hover:text-text-primary"
               >
                 <X size={20} />

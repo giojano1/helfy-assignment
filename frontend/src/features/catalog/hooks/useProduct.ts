@@ -13,5 +13,6 @@ export function useFeaturedProducts() {
   return useQuery({
     queryKey: ["products", "featured"],
     queryFn: catalogService.getFeaturedProducts,
+    staleTime: 5 * 60 * 1000,
   });
 }

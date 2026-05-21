@@ -9,12 +9,13 @@ import { Badge } from "../components/ui/Badge";
 import { Rating } from "../components/ui/Rating";
 import { Breadcrumb } from "../components/ui/Breadcrumb";
 import { Skeleton } from "../components/ui/Skeleton";
+import { ErrorCard } from "../components/ui/ErrorCard";
 
 const page = { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -20 } };
 
 export default function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
-  const { data: product, isLoading } = useProduct(slug ?? "");
+  const { data: product, isLoading, isError, refetch } = useProduct(slug ?? "");
   const { mutate: addToCart, isPending } = useAddToCart();
   const [qty, setQty] = useState(1);
   const [imgIdx, setImgIdx] = useState(0);
@@ -31,6 +32,14 @@ export default function ProductDetailPage() {
             <Skeleton height="120px" />
           </div>
         </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-12">
+        <ErrorCard message="Failed to load product." onRetry={() => void refetch()} />
       </div>
     );
   }
@@ -66,6 +75,7 @@ export default function ProductDetailPage() {
                 <img
                   src={currentImage.url}
                   alt={product.name}
+                  loading="lazy"
                   className="h-full w-full object-cover"
                 />
               ) : (
@@ -75,12 +85,14 @@ export default function ProductDetailPage() {
                 <>
                   <button
                     onClick={() => setImgIdx((i) => (i - 1 + images.length) % images.length)}
+                    aria-label="Previous image"
                     className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-1.5 text-white hover:bg-black/70"
                   >
                     <ChevronLeft size={18} />
                   </button>
                   <button
                     onClick={() => setImgIdx((i) => (i + 1) % images.length)}
+                    aria-label="Next image"
                     className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-1.5 text-white hover:bg-black/70"
                   >
                     <ChevronRight size={18} />
@@ -145,15 +157,17 @@ export default function ProductDetailPage() {
                 <div className="flex items-center rounded-lg border border-white/10">
                   <button
                     onClick={() => setQty((q) => Math.max(1, q - 1))}
+                    aria-label="Decrease quantity"
                     className="px-3 py-2 text-text-muted hover:text-text-primary"
                   >
                     −
                   </button>
-                  <span className="min-w-[2.5rem] text-center text-sm font-medium text-text-primary">
+                  <span className="min-w-[2.5rem] text-center text-sm font-medium text-text-primary" aria-live="polite" aria-label={`Quantity: ${qty}`}>
                     {qty}
                   </span>
                   <button
                     onClick={() => setQty((q) => Math.min(product.stock, q + 1))}
+                    aria-label="Increase quantity"
                     className="px-3 py-2 text-text-muted hover:text-text-primary"
                   >
                     +

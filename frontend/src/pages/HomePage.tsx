@@ -4,13 +4,14 @@ import { ArrowRight } from "lucide-react";
 import { useFeaturedProducts } from "../features/catalog/hooks/useProduct";
 import { useCategories } from "../features/catalog/hooks/useCategories";
 import { ProductGrid } from "../features/catalog/components/ProductGrid";
+import { ErrorCard } from "../components/ui/ErrorCard";
 import { useAddToCart } from "../features/cart/hooks/useAddToCart";
 import type { Product } from "../features/catalog/types";
 
 const page = { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -20 } };
 
 export default function HomePage() {
-  const { data: featured, isLoading } = useFeaturedProducts();
+  const { data: featured, isLoading, isError, refetch } = useFeaturedProducts();
   const { data: categories } = useCategories();
   const { mutate: addToCart } = useAddToCart();
 
@@ -65,11 +66,18 @@ export default function HomePage() {
             View all
           </Link>
         </div>
-        <ProductGrid
-          products={featured}
-          isLoading={isLoading}
-          onAddToCart={handleAddToCart}
-        />
+        {isError ? (
+          <ErrorCard
+            message="Failed to load featured products."
+            onRetry={() => void refetch()}
+          />
+        ) : (
+          <ProductGrid
+            products={featured}
+            isLoading={isLoading}
+            onAddToCart={handleAddToCart}
+          />
+        )}
       </section>
     </motion.div>
   );

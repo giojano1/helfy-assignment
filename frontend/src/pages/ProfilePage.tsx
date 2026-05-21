@@ -3,11 +3,12 @@ import { useProfile } from "../features/account/hooks/useProfile";
 import { ProfileForm } from "../features/account/components/ProfileForm";
 import { PasswordForm } from "../features/account/components/PasswordForm";
 import { Skeleton } from "../components/ui/Skeleton";
+import { ErrorCard } from "../components/ui/ErrorCard";
 
 const page = { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -20 } };
 
 export default function ProfilePage() {
-  const { data: profile, isLoading } = useProfile();
+  const { data: profile, isLoading, isError, refetch } = useProfile();
 
   return (
     <motion.div variants={page} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.2 }}>
@@ -20,6 +21,8 @@ export default function ProfilePage() {
               <Skeleton height="44px" />
               <Skeleton height="44px" />
             </div>
+          ) : isError ? (
+            <ErrorCard message="Failed to load profile." onRetry={() => void refetch()} />
           ) : profile ? (
             <ProfileForm profile={profile} />
           ) : null}

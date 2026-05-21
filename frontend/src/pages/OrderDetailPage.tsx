@@ -4,7 +4,8 @@ import { ChevronLeft } from "lucide-react";
 import { useOrder } from "../features/account/hooks/useOrders";
 import { OrderStatusTimeline } from "../features/account/components/OrderStatusTimeline";
 import { Badge } from "../components/ui/Badge";
-import { Spinner } from "../components/ui/Spinner";
+import { Skeleton } from "../components/ui/Skeleton";
+import { ErrorCard } from "../components/ui/ErrorCard";
 import type { OrderStatus } from "../features/checkout/types";
 
 const page = { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -20 } };
@@ -17,16 +18,69 @@ const statusColor: Record<OrderStatus, "yellow" | "blue" | "green" | "red" | "gr
   cancelled: "red",
 };
 
+function OrderDetailSkeleton() {
+  return (
+    <div>
+      <Skeleton height="20px" className="mb-6 w-32" />
+      <div className="mb-6 flex items-center justify-between">
+        <Skeleton height="32px" className="w-48" />
+        <Skeleton height="24px" className="w-20 rounded-full" />
+      </div>
+      <div className="grid gap-6 md:grid-cols-3">
+        <div className="md:col-span-2 flex flex-col gap-4">
+          <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+            <Skeleton height="16px" className="mb-3 w-12" />
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-3 py-2">
+                <Skeleton className="h-12 w-12 shrink-0 rounded-lg" />
+                <div className="flex flex-1 flex-col gap-1">
+                  <Skeleton height="14px" className="w-3/4" />
+                  <Skeleton height="12px" className="w-1/4" />
+                </div>
+                <Skeleton height="14px" className="w-16" />
+              </div>
+            ))}
+          </div>
+          <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+            <Skeleton height="16px" className="mb-2 w-32" />
+            <Skeleton height="14px" className="w-2/3" />
+          </div>
+          <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+            <Skeleton height="16px" className="mb-3 w-20" />
+            <div className="flex flex-col gap-2">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex justify-between">
+                  <Skeleton height="14px" className="w-16" />
+                  <Skeleton height="14px" className="w-16" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+          <Skeleton height="16px" className="mb-4 w-24" />
+          <div className="flex flex-col gap-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <Skeleton className="h-3 w-3 rounded-full" />
+                <Skeleton height="14px" className="w-24" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function OrderDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { data: order, isLoading } = useOrder(id ?? "");
+  const { data: order, isLoading, isError, refetch } = useOrder(id ?? "");
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-12">
-        <Spinner size="lg" />
-      </div>
-    );
+  if (isLoading) return <OrderDetailSkeleton />;
+
+  if (isError) {
+    return <ErrorCard message="Failed to load order." onRetry={() => void refetch()} />;
   }
 
   if (!order) {
@@ -59,7 +113,7 @@ export default function OrderDetailPage() {
                   <div key={item.id} className="flex items-center gap-3">
                     {img && (
                       <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-white/10 bg-white/5">
-                        <img src={img.url} alt={item.product.name} className="h-full w-full object-cover" />
+                        <img src={img.url} alt={item.product.name} loading="lazy" className="h-full w-full object-cover" />
                       </div>
                     )}
                     <div className="flex-1 min-w-0">

@@ -278,14 +278,14 @@ _(fill in)_
 
 ---
 
-### Prompt #11
+## Prompt #10
 
 Phase: Frontend — Debug API Data Flow
 Tool: Claude Code (terminal)
 Model: Claude (latest)
 Goal: Fix /products route showing empty data
 
-Prompt:
+**Prompt:**
 
 Debug and fix why /products route is rendering no data.
 
@@ -343,3 +343,104 @@ Ensure this mapping happens in the service layer, not in UI components.
 The backend's response shape { data: Product[], meta: { page, limit, total, totalPages } } is now correctly mapped into the PaginatedProducts structure the rest of the frontend expects. The catalog page should show products now.
 
 Stop after implementing the fix and briefly confirm the root cause was the mismatched response mapping.
+
+## Prompt #11
+
+Phase: Frontend — Runtime Crash Fix
+Tool: Claude Code (terminal)
+Model: Claude (latest)
+Goal: Fix OrdersPage crash (undefined length error)
+
+Prompt:
+
+Fix runtime crash in OrdersPage.tsx.
+
+Error
+Cannot read properties of undefined (reading 'length')
+
+1. Root cause investigation
+   Find where .length is accessed on a possibly undefined value
+   Trace orders data flow (API → hook → state → component)
+   Check if orders is undefined during initial render (loading state issue)
+2. Required fix
+   Ensure orders always has a safe default value ([])
+   Fix data destructuring from API/hook if needed
+   Add safe rendering:
+   orders?.length ?? 0
+   or default parameter in state/hook
+3. Data safety rules
+   Never assume API data exists before loading completes
+   Ensure loading state is handled before rendering list logic
+   Prevent UI crash even if API fails or returns null
+4. Rendering fix
+   If orders.length === 0, show empty state UI instead of crashing
+   Keep UI unchanged otherwise
+   Output expectations
+   No runtime crashes
+   /orders page loads even with empty or missing data
+   Fix only data handling, not UI redesign
+
+The backend data is valid — issue is frontend unsafe access to undefined.length.
+
+Stop after fixing and briefly confirm the cause was missing default array initialization.
+
+## Prompt #12
+
+Phase: Frontend — Production Polish (Phase 5)
+Tool: Claude Code (terminal)
+Model: Claude (latest)
+Goal: Add loading, empty, error states + performance + UX polish
+
+Prompt:
+
+Implement Phase 5 — Production Readiness across the frontend app. Do NOT add new features or change backend logic.
+
+1. Loading states
+   Every API-driven page/component must show a Skeleton loader while isLoading === true
+   Use existing UI Skeleton component only
+   Apply to: products, orders, cart, dashboard lists
+2. Empty states
+   If any list is empty ([].length === 0), show EmptyState component
+   Apply to: products, cart, orders, search results
+   Never show blank UI
+3. Error states
+   Add error handling for every data-fetching screen
+   Use isError or React Query error state
+   Show a friendly error card with:
+   error message
+   “Try Again” button → triggers refetch()
+   Ensure no page crashes on API failure
+4. Optimistic updates (Cart only)
+   Implement React Query optimistic updates for:
+   add to cart
+   update quantity
+   remove item
+   Use:
+   onMutate
+   onError (rollback)
+   onSettled
+   UI must update instantly before server response
+5. Accessibility improvements
+   All buttons/icons must have aria-label or visible text
+   Ensure modals:
+   trap focus
+   restore focus on close
+   Ensure WCAG AA contrast compliance (no visual redesign, just fix obvious issues)
+   All form inputs must have proper <label>
+6. Performance
+   Add React.lazy + Suspense for all route-level pages
+   Ensure product images use loading="lazy"
+   Set React Query cache time for product lists to 5 minutes
+   Constraints
+   Do NOT redesign UI
+   Do NOT add new features
+   Only improve robustness, UX states, and performance
+   Keep changes minimal and consistent with existing architecture
+   Output expectations
+   No blank screens anywhere in app
+   Smooth loading UX across all pages
+   Stable cart with optimistic updates
+   Improved performance (lazy loading + caching)
+   Fully production-ready frontend behavior
+
+Stop after implementing Phase 5 and summarize what was improved (loading, empty, error, performance, a11y).
