@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #6c63ff;
+  --color-surface: #1a1a2e;
+  --color-accent: #e94560;
+  --color-text-primary: #eaeaea;
+  --color-text-muted: #8892a4;
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-brand-surface text-text-primary font-sans antialiased;
+    min-height: 100vh;
+  }
+
+  /* Focus ring — visible for keyboard navigation */
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-primary ring-offset-2 ring-offset-brand-surface;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-brand-surface;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-text-muted rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-brand-primary;
+  }
+
+  /* Selection */
+  ::selection {
+    @apply bg-brand-primary text-white;
+  }
+}
+
+@layer components {
+  /* Skeleton shimmer animation */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      rgba(136, 146, 164, 0.1) 25%,
+      rgba(136, 146, 164, 0.2) 50%,
+      rgba(136, 146, 164, 0.1) 75%
+    );
+    background-size: 200% 100%;
+    @apply animate-shimmer rounded;
+  }
+}

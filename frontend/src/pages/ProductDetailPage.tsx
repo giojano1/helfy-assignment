@@ -1,0 +1,13 @@
+/**
+ * ProductDetailPage — stub for Phase 1.
+ * Full implementation in Phase 4 (catalog feature).
+ */
+export default function ProductDetailPage() {
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <h1 className="text-2xl font-semibold text-text-primary">
+        Product Detail
+      </h1>
+    </div>
+  );
+}
