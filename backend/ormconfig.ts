@@ -1,7 +1,8 @@
-import { AppDataSource } from "./src/config/database";
+import 'reflect-metadata';
+import { AppDataSource } from './src/config/database';
 
 /**
  * TypeORM CLI data source export.
- * Used by `npm run typeorm` for migration generation and running.
+ * synchronize: true — schema is auto-synced on startup (no migrations needed).
  */
 export default AppDataSource;

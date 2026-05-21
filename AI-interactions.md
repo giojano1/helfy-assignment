@@ -24,5 +24,282 @@
 
 **Manual Fixes:**
 
-- Adjusted Tailwind paths
-- Fixed import aliases
+- Gave prompt to skip creating any placeholder files, .gitkeep files, or empty folders.
+  All feature folders are already created manually as ai was taking way too much time for implementing placeholders.
+
+Switched from Cline to Claude Code for Phase 2-3 due to speed constraints.
+Cline was averaging 2-3 minutes per file on Phase 1 scaffolding.
+Claude Code completes the same tasks in under 5 minutes total.
+
+Decision: Use the right tool for each job. This IS the AI Gap analysis
+the assignment asks for — recognizing when a tool is inefficient and
+switching to a better one is exactly "Critical Thinking."
+
+### Prompt #2
+
+**Phase:** Database & Entities
+**Tool:** Claude Code (terminal)
+**Model:** Claude (latest)
+**Goal:** Create all TypeORM entities, seed script, and database config
+
+**Prompt:**
+
+> Read ai-blueprint/engineering-guidelines.md and ai-blueprint/capability-definitions.md first.
+>
+> Execute Phase 2:
+>
+> 1. Create all TypeORM entities in backend/src/models/: User, Product, Category, ProductImage, Tag, Cart, CartItem, Order, OrderItem with all relations, decorators, and fields
+> 2. Create backend/src/config/database.ts with synchronize: true
+> 3. Create backend/src/seed.ts with 3 categories, 20 realistic products, admin@shop.dev / Admin1234!, customer@shop.dev / Customer1234!
+>
+> Do not stop between steps. Fix all TypeScript errors before finishing.
+
+**Result:**
+✅ All TypeORM entities created with relations
+✅ Database config with synchronize: true
+✅ Seed script with realistic data
+
+**Why Claude Code instead of Cline:**
+Cline spent 50+ minutes on Phase 1 scaffolding. Claude Code completed Phase 2 in under
+5 minutes with no per-file approval prompts. Switched tools to meet the 6-hour deadline.
+
+---
+
+### Prompt #3
+
+**Phase:** Backend API
+**Tool:** Claude Code (terminal)
+**Model:** Claude (latest)
+**Goal:** Build complete REST API with all routes, controllers, services, repositories
+
+**Prompt:**
+
+> Read ai-blueprint/capability-definitions.md first.
+>
+> Execute Phase 3 — build the complete backend API.
+> Create the full stack (route → controller → service → repository) for:
+>
+> 1. AUTH — POST /api/v1/auth/register, /login, /refresh, /logout, GET /api/v1/auth/me
+> 2. PRODUCTS — GET /api/v1/products (paginated, search, filter by category/price/stock), GET /api/v1/products/featured, GET /api/v1/products/:slug
+> 3. CATEGORIES — GET /api/v1/categories
+> 4. CART — GET /api/v1/cart, POST /api/v1/cart/items, PATCH /api/v1/cart/items/:id, DELETE /api/v1/cart/items/:id, DELETE /api/v1/cart, POST /api/v1/cart/merge
+> 5. ORDERS — POST /api/v1/orders, GET /api/v1/orders, GET /api/v1/orders/:id
+> 6. USERS — GET /api/v1/users/me, PATCH /api/v1/users/me, PATCH /api/v1/users/me/password
+>
+> Rules:
+>
+> - Every response uses this envelope: { success: true, data: ... } or { success: false, error: { code, message } }
+> - Every route that needs auth uses authMiddleware
+> - Every request body validated with Zod before hitting the service
+> - Passwords hashed with bcrypt cost 12
+> - JWT access token 15min, refresh token 7 days in httpOnly cookie
+>
+> After all routes are created:
+>
+> 1. Wire all routers into src/app.ts
+> 2. Run tsc --noEmit and fix every TypeScript error
+> 3. Start the server and confirm it runs on port 4000
+
+**Result:**
+_(fill in after Claude Code finishes)_
+
+**Manual Fixes:**
+_(fill in any errors you had to fix)_
+
+### Prompt #4
+
+**Phase:** Frontend — Global Setup
+**Tool:** Claude Code (terminal)
+**Model:** Claude (latest)
+**Goal:** Build shared store, layout components, and UI primitives
+
+**Prompt:**
+
+> Read ai-blueprint/capability-definitions.md first.
+>
+> Build the frontend global setup only:
+>
+> - src/store/authStore.ts — Zustand slice: user, accessToken, isAuthenticated, setAuth, clearAuth
+> - src/components/layout/Header.tsx — logo, nav links, cart icon with badge, user dropdown or login link
+> - src/components/layout/Footer.tsx — 4 columns: brand, shop links, account links, newsletter input
+> - src/components/ui/ — Button, Input, Badge, Spinner, Skeleton, Modal, Pagination, EmptyState, Rating
+>
+> Dark premium theme: background #0F0F1A, primary #6C63FF, accent #E94560
+> Stop after this. Do not build any features yet.
+
+---
+
+### Prompt #5
+
+**Phase:** Frontend — Auth Feature
+**Tool:** Claude Code (terminal)
+**Model:** Claude (latest)
+**Goal:** Login, register, guards
+
+**Prompt:**
+
+> Build src/features/auth/ only:
+>
+> - hooks: useLogin, useRegister, useLogout
+> - AuthGuard and GuestGuard components
+> - LoginPage — split layout, left: brand gradient with logo, right: login form
+> - RegisterPage — same split layout mirrored
+>
+> Wire AuthGuard and GuestGuard into App.tsx routes.
+> Stop after this.
+
+**Result:**
+_(fill in)_
+
+**Manual Fixes:**
+_(fill in)_
+
+---
+
+### Prompt #6
+
+### Debug #1 — Infinite 401 Redirect Loop + Login Loading State
+
+**Phase:** Frontend — Auth Feature
+**Tool:** Claude Code (terminal)
+**Model:** Claude (latest)
+
+**Errors observed:**
+GET /api/v1/auth/me → 401
+POST /refresh → 401
+GET /api/v1/auth/me → 401
+POST /refresh → 401
+... repeating infinitely
+
+### Prompt #7
+
+**Phase:** Frontend — Catalog Feature
+**Tool:** Claude Code (terminal)
+**Model:** Claude (latest)
+**Goal:** Product listing, search, filters, detail page
+
+**Prompt:**
+
+> Build src/features/catalog/ only:
+>
+> - hooks: useProducts, useProduct, useCategories
+> - Components: ProductCard, ProductGrid, ProductFilters, ProductSearch, SortDropdown
+> - HomePage — hero banner, featured products grid, category cards
+> - CatalogPage — sidebar filters + product grid, all filters synced to URL params
+> - ProductDetailPage — image gallery, price, stock badge, quantity picker, add to cart button
+>
+> Every list shows Skeleton while loading. Empty state when no products found.
+> Stop after this.
+
+**Root cause:**
+Axios interceptor had no isRefreshing guard, refresh URL was wrong (/refresh instead of /api/v1/auth/refresh), and useLogin hook was not resetting loading state on error.
+
+**Fix prompt:**
+
+> Fix two bugs in the frontend:
+>
+> BUG 1 — Infinite 401 redirect loop
+> The Axios response interceptor in src/lib/axios.ts is causing an infinite loop.
+> Fix with these rules:
+>
+> 1. Add an isRefreshing flag and failedQueue to prevent concurrent refresh calls
+> 2. If refresh fails → call clearAuth() → redirect to /login ONCE → stop retrying
+> 3. Never intercept 401s from the refresh endpoint itself
+> 4. Never intercept 401s from /auth/login or /auth/register
+>
+> BUG 2 — Login page stuck on loading state
+> The login button stays loading after a failed attempt.
+> Fix the useLogin hook so isLoading resets to false on error.
+>
+> After fixing: confirm isRefreshing guard exists, confirm refresh URL is
+> /api/v1/auth/refresh, run tsc --noEmit and fix any errors.
+
+**Files changed:**
+
+- `frontend/src/lib/axios.ts`
+- `frontend/src/features/auth/hooks/useLogin.ts`
+
+---
+
+### Prompt #8
+
+**Phase:** Frontend — Cart Feature
+**Tool:** Claude Code (terminal)
+**Model:** Claude (latest)
+**Goal:** Cart drawer, cart page, optimistic updates
+
+**Prompt:**
+
+> Build src/features/cart/ only:
+>
+> - store: cartStore.ts with Zustand
+> - hooks: useCart, useAddToCart, useUpdateCartItem, useRemoveCartItem
+> - CartDrawer — slides in from right using Framer Motion, shows EmptyState when empty
+> - CartPage — full page cart, items list on left, order summary sticky on right
+>
+> Add to cart must use optimistic updates with rollback on error.
+> Stop after this.
+
+**Result:**
+_(fill in)_
+
+**Manual Fixes:**
+_(fill in)_
+
+---
+
+### Prompt #9
+
+**Phase:** Frontend — Checkout Feature
+**Tool:** Claude Code (terminal)
+**Model:** Claude (latest)
+**Goal:** Multi-step checkout flow
+
+**Prompt:**
+
+> Build src/features/checkout/ only:
+>
+> - Multi-step flow: Shipping Address → Shipping Method → Payment → Review → Confirmation
+> - CheckoutStepper — visual step indicator
+> - AddressForm — React Hook Form + Zod validation
+> - ShippingMethodSelector — radio cards: Standard (free), Express ($9.99), Overnight ($24.99)
+> - PaymentMethodSelector — Cash on Delivery or Credit Card (UI only, no real charge)
+> - OrderReview — summary of everything before placing order
+> - OrderConfirmation — animated success screen with Framer Motion checkmark
+>
+> On Place Order call POST /api/v1/orders then redirect to /account/orders/:id.
+> Stop after this.
+
+**Result:**
+_(fill in)_
+
+**Manual Fixes:**
+_(fill in)_
+
+---
+
+### Prompt #10
+
+**Phase:** Frontend — Account Feature
+**Tool:** Claude Code (terminal)
+**Model:** Claude (latest)
+**Goal:** Profile, order history, order detail
+
+**Prompt:**
+
+> Build src/features/account/ only:
+>
+> - hooks: useProfile, useOrders, useUpdateProfile
+> - AccountLayout — sidebar nav with Profile and Orders links, user avatar at top
+> - ProfilePage — edit name, email, avatar URL with inline save
+> - OrdersPage — paginated table: order ID, date, status Badge, total, View link
+> - OrderDetailPage — order items table + shipping address card + status Badge
+>
+> Status badge colors: pending=yellow, processing=blue, shipped=indigo, delivered=green, cancelled=red.
+> Stop after this.
+
+**Result:**
+_(fill in)_
+
+**Manual Fixes:**
+_(fill in)_

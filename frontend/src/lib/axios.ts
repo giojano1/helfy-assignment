@@ -55,6 +55,14 @@ function processQueue(error: unknown, token: string | null): void {
   failedQueue = [];
 }
 
+// Endpoints that must never trigger a silent refresh attempt.
+// The refresh endpoint itself + login/register (which legitimately return 401).
+const SKIP_REFRESH_SUFFIXES = ["/auth/refresh", "/auth/login", "/auth/register"];
+
+function shouldSkipRefresh(url: string): boolean {
+  return SKIP_REFRESH_SUFFIXES.some((suffix) => url.endsWith(suffix));
+}
+
 // Response interceptor — silent token refresh on 401
 apiClient.interceptors.response.use(
   (response) => response,
@@ -67,9 +75,16 @@ apiClient.interceptors.response.use(
       _retry?: boolean;
     };
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    const requestUrl = originalRequest.url ?? "";
+
+    // Never attempt refresh for auth endpoints — avoids infinite loops and
+    // ensures login/register errors propagate normally to the calling mutation.
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !shouldSkipRefresh(requestUrl)
+    ) {
       if (isRefreshing) {
-        // Queue the request until the refresh completes
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
@@ -85,8 +100,10 @@ apiClient.interceptors.response.use(
       isRefreshing = true;
 
       try {
+        // Use the full base URL so this call bypasses the apiClient interceptors
+        const refreshUrl = `${import.meta.env.VITE_API_BASE_URL as string}/auth/refresh`;
         const { data } = await axios.post<{ data: { accessToken: string } }>(
-          `${import.meta.env.VITE_API_BASE_URL as string}/auth/refresh`,
+          refreshUrl,
           {},
           { withCredentials: true },
         );
@@ -100,8 +117,10 @@ apiClient.interceptors.response.use(
         return apiClient(originalRequest);
       } catch (refreshError: unknown) {
         processQueue(refreshError, null);
+        // Clear auth state — AuthGuard will redirect to /login on its next render.
+        // Never do window.location.href here: it causes an infinite reload loop
+        // when useInitAuth fires on a page load with no valid session.
         clearAuth();
-        window.location.href = "/login";
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

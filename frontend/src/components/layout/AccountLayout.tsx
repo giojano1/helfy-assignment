@@ -1,35 +1,33 @@
-import { Outlet } from "react-router-dom";
+import { NavLink, Outlet } from "react-router-dom";
+import { User, Package } from "lucide-react";
+import Header from "./Header";
 
-/**
- * AccountLayout — sidebar nav + main content area.
- * Used by all /account/* pages.
- * Full implementation in Phase 4 (account feature).
- */
 export default function AccountLayout() {
-  return (
-    <div className="flex min-h-screen">
-      {/* Sidebar — full implementation in Phase 4 */}
-      <aside className="w-64 bg-brand-surface border-r border-white/10 p-6">
-        <nav className="flex flex-col gap-2">
-          <a
-            href="/account/profile"
-            className="text-text-muted hover:text-text-primary"
-          >
-            Profile
-          </a>
-          <a
-            href="/account/orders"
-            className="text-text-muted hover:text-text-primary"
-          >
-            Orders
-          </a>
-        </nav>
-      </aside>
+  const linkClass = ({ isActive }: { isActive: boolean }) =>
+    `flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors ${
+      isActive
+        ? "bg-brand-primary/20 text-brand-primary font-medium"
+        : "text-text-muted hover:bg-white/10 hover:text-text-primary"
+    }`;
 
-      {/* Main content */}
-      <main className="flex-1 p-8">
-        <Outlet />
-      </main>
+  return (
+    <div className="flex min-h-screen flex-col">
+      <Header />
+      <div className="mx-auto flex w-full max-w-7xl flex-1 gap-8 px-4 py-8">
+        <aside className="w-56 shrink-0">
+          <nav className="flex flex-col gap-1">
+            <NavLink to="/account/profile" className={linkClass}>
+              <User size={16} /> Profile
+            </NavLink>
+            <NavLink to="/account/orders" className={linkClass}>
+              <Package size={16} /> Orders
+            </NavLink>
+          </nav>
+        </aside>
+        <main className="flex-1 min-w-0">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }

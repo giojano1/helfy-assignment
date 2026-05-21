@@ -14,10 +14,12 @@ import { queryClient } from "./lib/queryClient";
 import AuthGuard from "./features/auth/components/AuthGuard";
 import GuestGuard from "./features/auth/components/GuestGuard";
 import AccountLayout from "./components/layout/AccountLayout";
+import PublicLayout from "./components/layout/PublicLayout";
+import AuthLayout from "./components/layout/AuthLayout";
+import CheckoutLayout from "./components/layout/CheckoutLayout";
+import { useInitAuth } from "./features/auth/hooks/useInitAuth";
+import { Spinner } from "./components/ui/Spinner";
 
-// ---------------------------------------------------------------------------
-// Route-level lazy imports — enables code splitting per page
-// ---------------------------------------------------------------------------
 const HomePage = lazy(() => import("./pages/HomePage"));
 const CatalogPage = lazy(() => import("./pages/CatalogPage"));
 const ProductDetailPage = lazy(() => import("./pages/ProductDetailPage"));
@@ -30,32 +32,31 @@ const OrdersPage = lazy(() => import("./pages/OrdersPage"));
 const OrderDetailPage = lazy(() => import("./pages/OrderDetailPage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 
-// ---------------------------------------------------------------------------
-// Animated routes wrapper — reads location for AnimatePresence key
-// ---------------------------------------------------------------------------
 function AnimatedRoutes() {
   const location = useLocation();
 
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        {/* Public routes */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/products" element={<CatalogPage />} />
-        <Route path="/products/:slug" element={<ProductDetailPage />} />
-        <Route path="/cart" element={<CartPage />} />
-
-        {/* Guest-only routes (redirect authenticated users away) */}
-        <Route element={<GuestGuard />}>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/products" element={<CatalogPage />} />
+          <Route path="/products/:slug" element={<ProductDetailPage />} />
+          <Route path="/cart" element={<CartPage />} />
         </Route>
 
-        {/* Protected routes (redirect unauthenticated users to /login) */}
-        <Route element={<AuthGuard />}>
-          <Route path="/checkout" element={<CheckoutPage />} />
+        <Route element={<GuestGuard />}>
+          <Route element={<AuthLayout />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+          </Route>
+        </Route>
 
-          {/* Account section — nested layout */}
+        <Route element={<AuthGuard />}>
+          <Route element={<CheckoutLayout />}>
+            <Route path="/checkout" element={<CheckoutPage />} />
+          </Route>
+
           <Route path="/account" element={<AccountLayout />}>
             <Route index element={<Navigate to="/account/profile" replace />} />
             <Route path="profile" element={<ProfilePage />} />
@@ -64,62 +65,52 @@ function AnimatedRoutes() {
           </Route>
         </Route>
 
-        {/* 404 catch-all */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </AnimatePresence>
   );
 }
 
-// ---------------------------------------------------------------------------
-// Root application component
-// ---------------------------------------------------------------------------
+function AppInner() {
+  useInitAuth();
+  return (
+    <>
+      <Suspense
+        fallback={
+          <div className="flex min-h-screen items-center justify-center">
+            <Spinner size="lg" />
+          </div>
+        }
+      >
+        <AnimatedRoutes />
+      </Suspense>
 
-/**
- * App — root component.
- * Provides React Query, React Router, and toast notifications.
- * All routes are declared here with lazy loading and AnimatePresence transitions.
- */
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: "#1A1A2E",
+            color: "#EAEAEA",
+            border: "1px solid rgba(108, 99, 255, 0.3)",
+          },
+          success: {
+            iconTheme: { primary: "#6C63FF", secondary: "#EAEAEA" },
+          },
+          error: {
+            iconTheme: { primary: "#E94560", secondary: "#EAEAEA" },
+          },
+        }}
+      />
+    </>
+  );
+}
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <Suspense
-          fallback={
-            <div className="flex min-h-screen items-center justify-center">
-              <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-primary border-t-transparent" />
-            </div>
-          }
-        >
-          <AnimatedRoutes />
-        </Suspense>
-
-        {/* Toast notifications — top-right, dark theme */}
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            style: {
-              background: "#1A1A2E",
-              color: "#EAEAEA",
-              border: "1px solid rgba(108, 99, 255, 0.3)",
-            },
-            success: {
-              iconTheme: {
-                primary: "#6C63FF",
-                secondary: "#EAEAEA",
-              },
-            },
-            error: {
-              iconTheme: {
-                primary: "#E94560",
-                secondary: "#EAEAEA",
-              },
-            },
-          }}
-        />
+        <AppInner />
       </BrowserRouter>
-
-      {/* React Query devtools — only in development */}
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
