@@ -30,4 +30,9 @@ export const cartService = {
   clearCart: async (): Promise<void> => {
     await apiClient.delete("/cart");
   },
+
+  mergeCart: async (items: Array<{ productId: string; quantity: number }>): Promise<Cart> => {
+    const res = await apiClient.post<ApiEnvelope<Cart>>("/cart/merge", { items });
+    return res.data.data;
+  },
 };

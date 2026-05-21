@@ -16,7 +16,16 @@ export default function HomePage() {
   const { mutate: addToCart } = useAddToCart();
 
   const handleAddToCart = (product: Product) => {
-    addToCart({ productId: product.id, quantity: 1 });
+    addToCart({
+      productId: product.id,
+      quantity: 1,
+      productSnapshot: {
+        name: product.name,
+        slug: product.slug,
+        price: Number(product.price),
+        images: product.images,
+      },
+    });
   };
 
   return (

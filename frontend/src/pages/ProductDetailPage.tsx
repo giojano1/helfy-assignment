@@ -175,7 +175,18 @@ export default function ProductDetailPage() {
                 </div>
 
                 <Button
-                  onClick={() => addToCart({ productId: product.id, quantity: qty })}
+                  onClick={() =>
+                    addToCart({
+                      productId: product.id,
+                      quantity: qty,
+                      productSnapshot: {
+                        name: product.name,
+                        slug: product.slug,
+                        price: Number(product.price),
+                        images: product.images,
+                      },
+                    })
+                  }
                   isLoading={isPending}
                   leftIcon={<ShoppingCart size={16} />}
                   className="flex-1"

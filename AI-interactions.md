@@ -444,3 +444,55 @@ Implement Phase 5 — Production Readiness across the frontend app. Do NOT add n
    Fully production-ready frontend behavior
 
 Stop after implementing Phase 5 and summarize what was improved (loading, empty, error, performance, a11y).
+
+## Prompt #13
+
+Phase: Final QA — Full Stack Production Checklist
+Tool: Claude Code (terminal)
+Model: Claude (latest)
+Goal: Verify full system readiness + fix blocking issues before release
+
+Prompt:
+
+Run a full production readiness audit for both frontend and backend and fix any issues preventing deployment.
+
+1. Backend verification
+   Ensure cd backend && npm run dev starts cleanly on port 4000
+   Ensure no runtime or TypeScript errors (npm run type-check)
+   Ensure npm run seed works and populates realistic data
+
+Verify all API routes return consistent envelope format:
+
+{ data, meta } 2. Frontend verification
+Ensure cd frontend && npm run dev runs on port 5173 without errors
+Ensure no TypeScript errors (npm run type-check)
+Ensure no console runtime crashes anywhere in app 3. Core flows validation
+Auth flow:
+register → login → protected routes → logout
+E-commerce flow:
+browse products → filter → product details → add to cart → checkout → order confirmation → order appears in account 4. Data & state correctness
+All API responses use standard envelope format (data + meta)
+Zod validation applied to all forms with proper field errors
+Cart state persists:
+authenticated users → database
+guest users → localStorage 5. UI/UX validation
+Mobile responsiveness tested at 375px width
+No overflow issues or broken layouts
+Empty/loading/error states exist everywhere 6. Documentation
+Ensure .env.example exists for both frontend and backend
+Ensure README.md includes:
+setup steps
+installation
+seed instructions
+dev server commands
+Constraints
+Fix issues directly (do not just report them)
+Do NOT change architecture unless necessary to fix blocking bugs
+Do NOT add new features
+Keep behavior identical, only stabilize system
+Output expectations
+Both apps run cleanly with zero critical errors
+All flows work end-to-end without crashes
+Project is fully production-ready
+
+Stop after completing checklist and summarize any fixes applied + remaining risks (if any).
